@@ -198,10 +198,18 @@ void admin_mode(){
                 continue;
             }
         } else if (admin_choice == 2){
+            printf("Old quantity of beans : %d\n",avail_beans);
+            printf("Old quantity of water : %d\n",avail_water);
+            printf("Old quantity of milk : %d\n",avail_milk);
+            printf("Old quantity of chocolate syrup : %d\n",avail_syrup);
             avail_beans = rand()%((20*THRESHOLD_BEANS)-THRESHOLD_BEANS + 1) + THRESHOLD_BEANS;
             avail_water = rand()%((20*THRESHOLD_WATER)-THRESHOLD_WATER + 1) + THRESHOLD_WATER;
             avail_milk = rand()%((20*THRESHOLD_MILK)-THRESHOLD_MILK + 1) + THRESHOLD_MILK;
             avail_syrup = rand()%((20*THRESHOLD_CHOCOLATE_SYRUP)-THRESHOLD_CHOCOLATE_SYRUP + 1) + THRESHOLD_CHOCOLATE_SYRUP;
+            printf("New quantity of beans : %d\n",avail_beans);
+            printf("New quantity of water : %d\n",avail_water);
+            printf("New quantity of milk : %d\n",avail_milk);
+            printf("New quantity of chocolate syrup : %d\n",avail_syrup);
         } else if (admin_choice == 3){
             printf("---------------------------\n");
             printf("|        COFFEE LIST      |\n");
