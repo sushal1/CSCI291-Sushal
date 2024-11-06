@@ -1,13 +1,13 @@
-//Libraries in use
+// Libraries in use
 #include <stdio.h>
 #include <stdbool.h> 
 
-//Setting values for SIZE, nRows, nCols
+// Setting values for SIZE, nRows, nCols
 #define SIZE 24
 #define nRows 8
 #define nCols 3
 
-//PROTOTYPES
+// PROTOTYPES
 void print_array(int array[], int length); //pre-declared function for printing array
 void print_matrix(int mat[][nCols], int rows); //pre-declared function for printing matrix
 
@@ -50,6 +50,12 @@ int main()
    reshape(arr, SIZE, arr2d); //calling the function that reshaps arr to arr2d
    printf("Array2D after reshaping: \n");
    print_matrix(arr2d, nRows);
+   
+   printf("Column-wise print of arr2d: \n");
+   trans_matrix(arr2d); //printing matrix columns of arr2d
+
+   //Searching for duplicates in arr
+   found_duplicate(arr,SIZE);
 
    return 0;
 }
@@ -129,5 +135,29 @@ void reshape(int arr[], int length, int arr2d[nRows][nCols]) {
       printf("Array length does not match the product of rows & columns of the 2D array.\n"); 
    }
 }
+
+void trans_matrix(int arr2d[nRows][nCols]) {
+   for (int j = 0; j < nCols; j++) {
+      for (int i = 0; i < nRows; i++) { // nested loop
+         printf("%d ", arr2d[i][j]);
+      }
+      printf("\n");
+   }
+}
+
+//searching for duplicates
+bool found_duplicate(int arr[], int length) {
+   for (int i = 0; i < length; i++) {
+      for (int j = i+1; j< length; j++){ //nested loop
+         if (arr[i] == arr[j]) {
+            printf("Duplicates found in array. \n"); // if duplicates found
+            return true;
+         }
+      }
+   }
+   printf("No duplicates found. \n"); // if duplicates not found
+   return false;
+}
+
 
 
