@@ -351,7 +351,7 @@ void search_update() {
             return;
         }
 
-    } if (search_choice == 2) { // if user chooses to update by kit number
+    } else if (search_choice == 2) { // if user chooses to update by kit number
         int kityes; // temp variable to store user input
         printf("Please enter the player's kit number: ");
         scanf("%d",&kityes); // storing user input
