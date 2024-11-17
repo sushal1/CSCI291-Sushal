@@ -18,12 +18,14 @@
 void display_menu(); // function that continually displays the text menu
 void enroll_club(); // function that allows user to enroll a team
 void add_player(); // function that allows user to add player
-void search_update(); // function that allows user to update player's details
+void search_update(); // function that allows user to search and then update details
 void display_club_statistics(); // function that displays the statistics of all the clubs
 
 // utility udfs
-void age_calculation(int ageteam[],int ind_age[][SQUAD_SIZE]); // function that calculates age of player's & average age
 void string_reader(char str[],int max_len); // function that reads strings with whitespaces, without newlines
+void update_details(int i, int j); // function that will handle the updating of player's details
+void age_calculation(int ageteam[],int ind_age[][SQUAD_SIZE]); // function that calculates age of player's & average age
+
 
 // STRUCTURES
 
@@ -103,7 +105,7 @@ void string_reader(char str[], int max_len) { // inputs are the string and the l
     str[strcspn(str,"\n")] = '\0'; // to replace newline character
 }
 
-// enrolling a club
+// function to enroll a club
 void enroll_club() {
     if (enrolledteams<NUM_TEAMS) { // if the number of enrolled teams is less than the max. number of teams
         char club_name[TEAM_LENGTH]; // temporary variable that stores the club name from the user
@@ -131,7 +133,7 @@ void enroll_club() {
     }
 }
 
-// adding a player to team
+// function to add a player to team
 void add_player() {
     if (enrolledteams == 0) { // handling error
         printf("Error: No clubs enrolled. Please enroll a club and try again.\n");
@@ -218,8 +220,99 @@ void add_player() {
     printf("Player successfully added to %s.\n",teams[choice-1].name);
 }
 
-void search_update() {
+// function to update a player's details
+void update_details(int i, int j) {
+    while (true) {
+        int updatesearch; // temp variable for user input
+        printf("Which details would you like to update? (1/2/3/4) or 0 to cancel: ");
+        scanf("%d",&updatesearch); // storing user input
+        getchar(); // clearing newline
+        if (updatesearch == 1) { // if user wants to update player name
+            while (true) {
+                char name_attr[NAME_LENGTH]; // temp variable for user input
+                int pla_index = teams[i].ActiveSize; // index for easy access
+                printf("Please enter the player's name: ");
+                string_reader(name_attr,NAME_LENGTH); // storing user input
+                int foundperson = 0; // temp variable to check if name already in system                        
+                for (int k = 0;k<enrolledteams;k++){ // outer loop that will run for the number of teams
+                    for (int l = 0; l<pla_index; l++){ // inner loop that will run for number of players
+                        // checking if player name & kit number both are found
+                        if (strcasecmp(teams[k].team_players[l].name,name_attr) == 0){
+                            printf("Error: Player already in system.\n"); // error
+                            printf("Player Name: %s\n",teams[k].team_players[l].name);
+                            printf("Kit Number: %d\n",teams[k].team_players[l].kit_num);
+                            printf("Please enter new details.\n"); //prompting user to enter details again
+                            foundperson = 1; // found variable incremented
+                        }
+                    }
+                }
+                if (foundperson == 0) { // if found hasn't been incremented
+                    // storing user input in struct
+                    strcpy(teams[i].team_players[j].name,name_attr); // using strcpy()
+                    break; // returning false to break out of loop
+                }
+            }
+            printf("Player name updated successfully.\n");
 
+        } else if (updatesearch == 2) { // if user chooses to update kit number
+            while (true) {
+                int kit_attr; // temp var for user input
+                int pla_index = teams[i].ActiveSize; // index for easy access
+                // do while loop to ensure that user enters a value between 1 and 99
+                do {
+                    printf("Enter the player's kit number (1-99): ");
+                    scanf("%d", &kit_attr); // storing user's input
+                    getchar(); // clearing newline
+                    if (kit_attr < 1 || kit_attr > 99) {
+                        printf("Error: Kit number must be between 1 and 99.\n");
+                    }
+                } while (kit_attr < 1 || kit_attr > 99);
+                int foundperson = 0; // temp var for checking if kit numebr alr in system                 
+                for (int k = 0;k<enrolledteams;k++){ // outer loop that will run for the number of teams
+                    for (int l = 0; l<pla_index; l++){ // inner loop that will run for number of players
+                        // checking if player name & kit number both are found
+                        if (teams[k].team_players[l].kit_num == kit_attr){
+                            printf("Error: Player already in system.\n");// error
+                            printf("Player Name: %s\n",teams[k].team_players[l].name);
+                            printf("Kit Number: %d\n",teams[k].team_players[l].kit_num);
+                            printf("Please enter new details.\n"); //prompting user to enter details again
+                            foundperson = 1; // found variable incremented
+                        }
+                    }
+                }
+                if (foundperson == 0) { // if found hasn't been incremented
+                    // storing user input in struct
+                    teams[i].team_players[j].kit_num = kit_attr; 
+                    break; // returning false to break out of loop
+                }
+            }
+            printf("Kit number updated successfully.\n");
+
+        } else if (updatesearch == 3) { // if user wants to update dob
+            printf("Enter the new date of birth (dd/mm/yyyy): ");
+            // storing user input
+            scanf("%d %d %d",&teams[i].team_players[j].dob.dd,&teams[i].team_players[j].dob.mm,&teams[i].team_players[j].dob.yyyy);
+            getchar(); // clearing newline
+            printf("Date of birth updated successfully.\n");
+            
+        } else if (updatesearch == 4) { // if user wants to update position
+            printf("Enter the new position of the player: ");
+            scanf("%s",&teams[i].team_players[j].position); // storing user input
+            getchar(); // clearing newline
+            printf("Position updated successfully.\n");
+
+        } else if (updatesearch == 0) { // if user cancels
+            printf("Update canceled.\n");
+            break; // breaks back to menu
+
+        } else { // if user enters invalid input
+            printf("Error: Invalid input. Please enter a valid option.\n"); // handling error
+        }
+    }
+}
+
+// function to search for players and then update their details
+void search_update() {
     if (enrolledteams == 0) { // handling error
         printf("Error: No clubs enrolled. Please enroll a club and try again.\n");
         return;
@@ -248,98 +341,7 @@ void search_update() {
                     printf("2. Kit number: %d\n",teams[i].team_players[j].kit_num);
                     printf("3. Date of birth: %d/%d/%d\n",teams[i].team_players[j].dob.dd,teams[i].team_players[j].dob.mm,teams[i].team_players[j].dob.yyyy);
                     printf("4. Position: %s\n",teams[i].team_players[j].position);
-
-                    while (true) { // will run till 0 is entered
-                        int updatesearch; // user's choice for updating
-                        printf("Which details would you like to update? (1/2/3/4) or 0 to cancel: ");
-                        scanf("%d",&updatesearch); // storing user input
-                        getchar(); // clearing newline
-
-                        if (updatesearch == 1) { // for updating player's name
-                            while (true) {
-                                char name_attr[NAME_LENGTH]; // temporary variable to store name
-                                int pla_index = teams[i].ActiveSize; // index for easy traversal
-                                printf("Please enter the player's name: ");
-                                string_reader(name_attr,NAME_LENGTH); // storing user input
-                                int foundperson = 0; // temp variable to check if player already enrolled                        
-                                for (int k = 0;k<enrolledteams;k++){ // outer loop that will run for the number of teams
-                                    for (int l = 0; l<pla_index; l++){ // inner loop that will run for number of players
-                                        // checking if player name & kit number both are found
-                                        if (strcasecmp(teams[k].team_players[l].name,name_attr) == 0){
-                                            printf("Error: Player already in system.\n"); // error
-                                            printf("Player Name: %s\n",teams[k].team_players[l].name);
-                                            printf("Kit Number: %d\n",teams[k].team_players[l].kit_num);
-                                            printf("Please enter new details.\n"); //prompting user to enter details again
-                                            foundperson = 1; // found variable incremented
-                                        }
-                                    }
-                                }
-                                if (foundperson == 0) { // if found hasn't been incremented
-                                    // storing user input in struct
-                                    strcpy(teams[i].team_players[j].name,name_attr); // using strcpy()
-                                    break; // returning false to break out of loop
-                                }
-                            }
-                            printf("Player name updated successfully.\n");
-
-                        } else if (updatesearch == 2) { // if user chooses to update kit number
-                            while (true) {
-                                int kit_attr; // temp variable to store user input
-                                int pla_index = teams[i].ActiveSize; // index for easy access
-
-                                // do while loop to ensure that user enters a kit number in specified range
-                                do {
-                                    printf("Enter the player's kit number (1-99): ");
-                                    scanf("%d", &kit_attr); // storing user's input
-                                    getchar(); // clearing newline
-                                    if (kit_attr < 1 || kit_attr > 99) {
-                                        printf("Error: Kit number must be between 1 and 99.\n");
-                                    }
-                                } while (kit_attr < 1 || kit_attr > 99);
-
-                                int foundperson = 0; // temp variable to check if player is already enrolled                             
-                                for (int k = 0;k<enrolledteams;k++){ // outer loop that will run for the number of teams
-                                    for (int l = 0; l<pla_index; l++){ // inner loop that will run for number of players
-                                        // checking if player name & kit number both are found
-                                        if (teams[k].team_players[l].kit_num == kit_attr){
-                                            printf("Error: Player already in system.\n"); // error
-                                            printf("Player Name: %s\n",teams[k].team_players[l].name);
-                                            printf("Kit Number: %d\n",teams[k].team_players[l].kit_num);
-                                            printf("Please enter new details.\n"); //prompting user to enter details again
-                                            foundperson = 1; // found variable incremented
-                                        }
-                                    }
-                                }
-                                if (foundperson == 0) { // if found hasn't been incremented
-                                    // storing user input in struct
-                                    teams[i].team_players[j].kit_num = kit_attr;
-                                    break; // returning false to break out of loop
-                                }
-                            }
-                            printf("Kit number updated successfully.\n");
-
-                        } else if (updatesearch == 3) { // if user updates dob
-                            printf("Enter the new date of birth (dd/mm/yyyy): ");
-                            // storing user input
-                            scanf("%d %d %d",&teams[i].team_players[j].dob.dd,&teams[i].team_players[j].dob.mm,&teams[i].team_players[j].dob.yyyy);
-                            getchar(); // clearing newline
-                            printf("Date of birth updated successfully.\n");
-                           
-                        } else if (updatesearch == 4) { // if user updates position
-                            printf("Enter the new position of the player: ");
-                            // storing user input
-                            scanf("%s",&teams[i].team_players[j].position);
-                            getchar(); // clearing newline
-                            printf("Position updated successfully.\n");
-
-                        } else if (updatesearch == 0) { // if user cancels
-                            printf("Update canceled.\n");
-                            break; // breaking out of loop to menu
-
-                        } else { // if user inputs anything else
-                            printf("Error: Invalid input. Please enter a valid option.\n"); // handling error
-                        }
-                    }
+                    update_details(i,j); // function for updating details
                 }
             }
         }
@@ -365,93 +367,7 @@ void search_update() {
                     printf("2. Kit number: %d\n",teams[i].team_players[j].kit_num);
                     printf("3. Date of birth: %d/%d/%d\n",teams[i].team_players[j].dob.dd,teams[i].team_players[j].dob.mm,teams[i].team_players[j].dob.yyyy);
                     printf("4. Position: %s\n",teams[i].team_players[j].position);
-                    while (true) {
-                        int updatesearch; // temp variable for user input
-                        printf("Which details would you like to update? (1/2/3/4) or 0 to cancel: ");
-                        scanf("%d",&updatesearch); // storing user input
-                        getchar(); // clearing newline
-                        if (updatesearch == 1) { // if user wants to update player name
-                            while (true) {
-                                char name_attr[NAME_LENGTH]; // temp variable for user input
-                                int pla_index = teams[i].ActiveSize; // index for easy access
-                                printf("Please enter the player's name: ");
-                                string_reader(name_attr,NAME_LENGTH); // storing user input
-                                int foundperson = 0; // temp variable to check if name already in system                        
-                                for (int k = 0;k<enrolledteams;k++){ // outer loop that will run for the number of teams
-                                    for (int l = 0; l<pla_index; l++){ // inner loop that will run for number of players
-                                        // checking if player name & kit number both are found
-                                        if (strcasecmp(teams[k].team_players[l].name,name_attr) == 0){
-                                            printf("Error: Player already in system.\n"); // error
-                                            printf("Player Name: %s\n",teams[k].team_players[l].name);
-                                            printf("Kit Number: %d\n",teams[k].team_players[l].kit_num);
-                                            printf("Please enter new details.\n"); //prompting user to enter details again
-                                            foundperson = 1; // found variable incremented
-                                        }
-                                    }
-                                }
-                                if (foundperson == 0) { // if found hasn't been incremented
-                                    // storing user input in struct
-                                    strcpy(teams[i].team_players[j].name,name_attr); // using strcpy()
-                                    break; // returning false to break out of loop
-                                }
-                            }
-                            printf("Player name updated successfully.\n");
-
-                        } else if (updatesearch == 2) { // if user chooses to update kit number
-                            while (true) {
-                                int kit_attr; // temp var for user input
-                                int pla_index = teams[i].ActiveSize; // index for easy access
-                                // do while loop to ensure that user enters a value between 1 and 99
-                                do {
-                                    printf("Enter the player's kit number (1-99): ");
-                                    scanf("%d", &kit_attr); // storing user's input
-                                    getchar(); // clearing newline
-                                    if (kit_attr < 1 || kit_attr > 99) {
-                                        printf("Error: Kit number must be between 1 and 99.\n");
-                                    }
-                                } while (kit_attr < 1 || kit_attr > 99);
-                                int foundperson = 0; // temp var for checking if kit numebr alr in system                 
-                                for (int k = 0;k<enrolledteams;k++){ // outer loop that will run for the number of teams
-                                    for (int l = 0; l<pla_index; l++){ // inner loop that will run for number of players
-                                        // checking if player name & kit number both are found
-                                        if (teams[k].team_players[l].kit_num == kit_attr){
-                                            printf("Error: Player already in system.\n");// error
-                                            printf("Player Name: %s\n",teams[k].team_players[l].name);
-                                            printf("Kit Number: %d\n",teams[k].team_players[l].kit_num);
-                                            printf("Please enter new details.\n"); //prompting user to enter details again
-                                            foundperson = 1; // found variable incremented
-                                        }
-                                    }
-                                }
-                                if (foundperson == 0) { // if found hasn't been incremented
-                                    // storing user input in struct
-                                    teams[i].team_players[j].kit_num = kit_attr; 
-                                    break; // returning false to break out of loop
-                                }
-                            }
-                            printf("Kit number updated successfully.\n");
-
-                        } else if (updatesearch == 3) { // if user wants to update dob
-                            printf("Enter the new date of birth (dd/mm/yyyy): ");
-                            // storing user input
-                            scanf("%d %d %d",&teams[i].team_players[j].dob.dd,&teams[i].team_players[j].dob.mm,&teams[i].team_players[j].dob.yyyy);
-                            getchar(); // clearing newline
-                            printf("Date of birth updated successfully.\n");
-                           
-                        } else if (updatesearch == 4) { // if user wants to update position
-                            printf("Enter the new position of the player: ");
-                            scanf("%s",&teams[i].team_players[j].position); // storing user input
-                            getchar(); // clearing newline
-                            printf("Position updated successfully.\n");
-
-                        } else if (updatesearch == 0) { // if user cancels
-                            printf("Update canceled.\n");
-                            break; // breaks back to menu
-
-                        } else { // if user enters invalid input
-                            printf("Error: Invalid input. Please enter a valid option.\n"); // handling error
-                        }
-                    }
+                    update_details(i,j); // function for updating details
                 }
             }
         }
@@ -460,6 +376,9 @@ void search_update() {
             printf("Error: Player not found.\n");
             return;
         }
+    } else {
+        printf("Error: Invalid input entered.\n");
+        return;
     }
 }
 
